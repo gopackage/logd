@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/apex/log"
+	"github.com/gomodule/redigo/redis"
 	"github.com/rogpeppe/fastuuid"
 )
 
@@ -33,7 +34,14 @@ func (s *Server) Start() error {
 	if err != nil {
 		return err
 	}
-	log.Info("Connected")
+	log.Info("UDP connected")
+
+	red, err := redis.Dial("tcp", ":6379")
+	if err != nil {
+		log.WithError(err).Fatal("Redis connection failed")
+	}
+	defer red.Close()
+	log.Info("Redis connected")
 
 	s.conn = conn
 	buffer := make([]byte, 512)
